@@ -1,0 +1,26 @@
+<h1 class="title">Transfer</h1>
+<h2 class="subtitle">{{ account.name }}</h2>
+<form [formGroup]="transferForm" (ngSubmit)="executeTransfer()">
+  <div class="field">
+    <label class="label" for="recipient">Choose a recipient:</label>
+    <div class="control select">
+      <select name="recipient" id="recipient-select" formControlName="recipient" required="true">
+        @for (recipient of recipientAccounts; track $index) {
+          <option [value]="recipient.id">{{ recipient.name }}</option>
+        }
+      </select>
+    </div>
+  </div>
+  <div class="field is-pulled-left">
+    <div class="control">
+      <label class="label" for="amount">Amount:</label>
+      <input class="input" type="number" id="amount" name="amount" min="1" formControlName="amount" required="true" />
+      @if (transferForm.status === 'INVALID') {<p class="help is-danger">Form data is not valid</p>}
+    </div>
+  </div>
+  <div class="field">
+    <div class="control">
+      <button class="button is-link" type="submit">Transfer</button>
+    </div>
+  </div>
+</form>

@@ -1,0 +1,13 @@
+<h1 class="title">Bank Dashboard</h1>
+<h2 class="subtitle">Accounts</h2>
+<div class="grid is-col-min-12 py-5">
+  @for (account of accounts; track $index) {
+    <app-account-summary [account]="account" (transferClicked)="goToTransferPage(account)" (withdrawalClicked)="goToWithdrawalPage(account)"></app-account-summary>
+  }
+</div>
+<h2 class="subtitle">Transactions</h2>
+<div>
+  <pre>
+    {{ transactions | json }}
+  </pre>
+</div>

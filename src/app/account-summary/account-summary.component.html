@@ -1,0 +1,16 @@
+<div class="cell card mb-5">
+  <div class="card-header">
+    <h2 class="card-header-title">{{account.name}}</h2>
+    <span class="card-header-icon">
+      @if (account.balance > 0) {<span class="tag is-success is-light">Success</span>}
+      @else {<span class="tag is-danger is-light">Danger</span>}
+    </span>
+  </div>
+  <div class="card-content">
+    <span class="is-size-2">{{account.balance | currency }}</span>
+  </div>
+  <div class="card-footer">
+    <button class="card-footer-item withdrawal" (click)="withdrawalButtonClicked()">Withdrawal</button>
+    <button class="card-footer-item transfer" (click)="transferButtonClicked()">Transfer</button>
+  </div>
+</div>
