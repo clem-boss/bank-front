@@ -1,40 +1,30 @@
 import { Injectable } from '@angular/core';
-import { Account, accounts, Transaction, transactions } from './accounts';
+import { Account, Transaction } from './accounts';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AccountService {
-  private readonly _accounts = accounts;
-  private readonly _transactions = transactions;
-  constructor() { }
+  constructor(private readonly http: HttpClient) { }
 
-  getAccounts(): Account[] {
-    return this._accounts;
+  getAccounts(): Observable<Account[]> {
+    return this.http.get<Account[]>('http://localhost:8080/api/accounts');
   }
 
-  getAccountById(accountId: number): Account | undefined {
-    return this._accounts.find(account => account.id === accountId);
+  getAccountById(accountId: number): Observable<Account> {
+    return this.http.get<Account>(`http://localhost:8080/api/accounts/${accountId}`);
   }
 
-  transfer(from: number, to: number, amount: number) {
-    const issuer = this._accounts.find(account => account.id === from);
-    const recipient = this._accounts.find(accounts => accounts.id === to);
-    if (!issuer || !recipient) {
-      throw new Error();
-    }
-
-    issuer.balance = issuer.balance-amount;
-    recipient.balance = recipient.balance+amount;
-    transactions.push({
-      amount,
-      from,
-      to,
-      timestamp: Date.now()
-    })
+  postTransaction(issuerId: number, recipientId: number, amount: number): Observable<any> {
+    return this.http.post(
+      `http://localhost:8080/api/transactions?issuerId=${encodeURIComponent(issuerId.toString())}&recipientId=${encodeURIComponent(recipientId.toString())}&amount=${encodeURIComponent(amount.toString())}`,
+      {}
+    );
   }
 
-  getTransactions(): Transaction[] {
-    return this._transactions;
+  getTransactions(): Observable<Transaction[]> {
+    return this.http.get<Transaction[]>(`http://localhost:8080/api/transactions`);
   }
 }

@@ -1,8 +1,9 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Account } from '../accounts';
 import { AccountService } from '../account.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-transfer-page',
@@ -10,20 +11,22 @@ import { AccountService } from '../account.service';
   templateUrl: './transfer-page.component.html',
   styleUrl: './transfer-page.component.css'
 })
-export class TransferPageComponent implements OnInit {
+export class TransferPageComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   account: Account = this.route.snapshot.data['account'];
   recipientAccounts!: Account[];
   transferForm = new FormGroup({
-    recipient: new FormControl<Account | null>(null, Validators.required),
+    recipient: new FormControl<number | null>(null, Validators.required),
     amount: new FormControl<number>(1, Validators.required)
   });
+  subscription!: Subscription;
 
   constructor(protected accountService: AccountService) {}
 
   ngOnInit() {
-    const accounts = this.accountService.getAccounts();
-    this.recipientAccounts = accounts.filter(account => account.id !== this.account.id);
+    this.subscription = this.accountService.getAccounts().subscribe(accounts => {
+      this.recipientAccounts = accounts.filter(account => account.id !== this.account.id);
+    });
   }
 
   executeTransfer() {
@@ -32,6 +35,17 @@ export class TransferPageComponent implements OnInit {
     if (!recipient || !amount) {
       return;
     }
-    this.accountService.transfer(this.account.id, Number(recipient), amount);
+    this.accountService.postTransaction(this.account.id, recipient, amount).subscribe({
+      next: (response) => {
+        console.log('Transaction posted successfully', response);
+      },
+      error: (error) => {
+        console.error('Error posting transaction', error);
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 }

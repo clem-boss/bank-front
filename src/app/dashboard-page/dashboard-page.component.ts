@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { AccountSummaryComponent } from '../account-summary/account-summary.component';
 import { AccountService } from '../account.service';
 import { CommonModule } from '@angular/common';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard-page',
@@ -13,14 +14,14 @@ import { CommonModule } from '@angular/common';
 })
 export class DashboardPageComponent {
   private readonly router = inject(Router);
-  accounts!: Account[];
-  transactions!: Transaction[];
+  accounts$!: Observable<Account[]>;
+  transactions$!: Observable<Transaction[]>;
 
   constructor(protected accountService: AccountService) {}
 
   ngOnInit() {
-    this.accounts = this.accountService.getAccounts();
-    this.transactions = this.accountService.getTransactions();
+    this.accounts$ = this.accountService.getAccounts();
+    this.transactions$ = this.accountService.getTransactions();
   }
 
   goToTransferPage(account: Account) {
